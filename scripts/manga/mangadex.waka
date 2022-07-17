@@ -57,6 +57,8 @@ func handleMangaItem(manga) {
 
 func getGallery(page, query) {
 
+    limit = 12;
+
     params = {
         offset: limit * page
     };
@@ -213,10 +215,12 @@ func getConfigInfo() {
 
 
 func main() {
-//    gallery = getGallery({
-//        page: 2,
-//        query: ""
-//    });
+    gallery = getGallery({
+        page: 2,
+        query: ""
+    });
+
+    print(gallery);
 
 //    concrete = getConcrete({
 //     uid: gallery[0]["uid"]
@@ -228,6 +232,8 @@ func main() {
     concrete = getPages({
         uid: "255412eb-67df-4058-a4a5-fc3252676f5f"
     });
+
+   // print(concrete["value"]);
 
 //    print(gallery);
    print(concrete);
