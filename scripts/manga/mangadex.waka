@@ -123,10 +123,18 @@ func handleChapterItem(chapter) {
     }
 
     timestamp = chapter["attributes"]["publishAt"];
+
+    order = 0;
+
+    if(attr["chapter"] != null) {
+       order = attr["chapter"];
+    }
+
     return buildChapter({
         uid: uid,
         title: title,
-        timestamp: timestamp
+        timestamp: timestamp,
+        order: order
     });
 }
 
