@@ -102,9 +102,15 @@ func getChaptersData(uid, offset) {
 
 func handleChapterItem(chapter) {
     uid = chapter["id"];
+
+    attr = chapter["attributes"];
+
+    prefix = "Volume " + attr["volume"] + " Chapter " + attr["chapter"];
     title = chapter["attributes"]["title"];
     if(title == null) {
-        title = "";
+        title = prefix;
+    } else {
+        title = prefix + " | " + title;
     }
 
     timestamp = chapter["attributes"]["publishAt"];
