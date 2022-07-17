@@ -64,7 +64,7 @@ func getGallery(page, query) {
     };
 
     if(query != "") {
-        params["query"] = query;
+        params["title"] = query;
     }
 
     result = (httpGet({
