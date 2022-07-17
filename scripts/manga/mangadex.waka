@@ -93,7 +93,11 @@ func getChaptersData(uid, offset) {
         params: {
             limit: 100,
             offset: offset,
-            translatedLanguage: ["en"]
+            translatedLanguage: ["en"],
+            order: {
+                volume: "asc",
+                chapter: "asc"
+            }
         },
         paths: {
             mangaId: uid
@@ -124,17 +128,11 @@ func handleChapterItem(chapter) {
 
     timestamp = chapter["attributes"]["publishAt"];
 
-    order = 0;
-
-    if(attr["chapter"] != null) {
-       order = attr["chapter"];
-    }
 
     return buildChapter({
         uid: uid,
         title: title,
-        timestamp: timestamp,
-        order: order
+        timestamp: timestamp
     });
 }
 
