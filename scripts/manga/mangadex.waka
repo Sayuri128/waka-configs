@@ -140,7 +140,16 @@ func getChapters(uid)  {
 
     chapters = [];
 
-    for(i = 0; i < data.length; i = i + 1) {
+    for(i = 0; chapters.length < result["total"]; i = i + 1) {
+        if(i == data.length) {
+            firstChapters = getChaptersData({
+                offset: 0,
+                uid: uid
+            });
+            result = jsonDecode(firstChapters["body"]);
+            data = result["data"];
+            i = 0;
+        }
         addToList(chapters, handleChapterItem({
             chapter: data[i]
         }));
