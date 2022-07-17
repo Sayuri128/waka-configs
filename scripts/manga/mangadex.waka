@@ -1,0 +1,237 @@
+import waka_json;
+import waka_http;
+import waka_collections;
+import waka_models;
+
+func getCover(coverArtUid, mangaId) {
+
+    cover = "";
+
+    coverResult = httpGet({
+        url: "https://api.mangadex.org/cover/coverArtId",
+        params: {},
+        paths: {
+            coverArtId: coverArtUid
+        }
+    });
+
+    decodedCover = jsonDecode(coverResult["body"]);
+
+    coverStatusResult = decodedCover["result"];
+
+    if(coverStatusResult == "ok") {
+        fileName = decodedCover["data"].attributes.fileName;
+        cover = "https://mangadex.org/covers/" + mangaId + "/" + fileName;
+    }
+
+    return cover;
+}
+
+func getCoverId(data) {
+    coverArtId = "";
+    for(i = 0; i < data.length; i = i + 1) {
+        if(data[i].type == "cover_art") {
+            coverArtId = data[i]["id"];
+        }
+    }
+    return coverArtId;
+}
+
+func handleMangaItem(manga) {
+    uid = manga["id"];
+    title = manga["attributes"]["title"].values.first;
+
+    cover = getCover({
+        coverArtUid: getCoverId({
+            data: manga["relationships"]
+        }),
+        mangaId: uid
+    });
+
+    return buildGallery({
+        uid: uid,
+        title: title,
+        cover: cover
+    });
+}
+
+func getGallery(limit, page, query) {
+
+    params = {
+        limit: limit,
+        offset: limit * page
+    };
+
+    if(query != "") {
+        params["query"] = query;
+    }
+
+    result = (httpGet({
+        url: "https://api.mangadex.org/manga",
+        params: params,
+        paths: {}
+    }));
+
+    decoded = jsonDecode(result["body"]);
+    data = decoded["data"];
+
+    mangas = [];
+
+    for(i = 0; i < data.length; i = i + 1) {
+        addToList(mangas, handleMangaItem({
+            manga: data[i]
+        }));
+    }
+
+    return mangas;
+}
+
+func getChaptersData(uid, offset) {
+    return httpGet({
+        url: "https://api.mangadex.org/manga/mangaId/feed",
+        params: {
+            limit: 100,
+            offset: offset
+        },
+        paths: {
+            mangaId: uid
+        }
+    });
+}
+
+func handleChapterItem(chapter) {
+    uid = chapter["id"];
+    title = chapter["attributes"]["title"];
+    timestamp = chapter["attributes"]["publishAt"];
+    return buildChapter({
+        uid: uid,
+        title: title,
+        timestamp: timestamp
+    });
+}
+
+func getChapters(uid)  {
+
+    firstChapters = getChaptersData({
+        offset: 0,
+        uid: uid
+    });
+    result = jsonDecode(firstChapters["body"]);
+
+    chapters = [];
+
+    for(i = 0; chapters.length < 100; i = i + 1) {
+        addToList(chapters, handleChapterItem({
+            chapter: result["data"][i]
+        }));
+    }
+
+    return chapters;
+}
+
+func getPages(uid) {
+
+    result = httpGet({
+        url: "https://api.mangadex.org/at-home/server/chapterUid",
+        params: {},
+        paths: {
+            chapterUid: uid
+        }
+    });
+
+    body = jsonDecode(result["body"]);
+
+    return buildPages({
+        uid: uid,
+        value: body["chapter"]["data"]
+    });
+}
+
+func handleConcreteView(data) {
+
+    originalTitle = data["attributes"]["title"].values.first;
+    prettyTitle = originalTitle;
+
+    title = buildTitle({
+        original: originalTitle,
+        pretty: prettyTitle
+    });
+
+    cover = getCover({
+        coverArtUid: getCoverId({
+            data: data["relationships"]
+        }),
+        mangaId: data["id"]
+    });
+
+    rawTags = data["attributes"]["tags"];
+
+    tags = [];
+
+    for(i = 0; i < rawTags.length; i = i + 1) {
+        addToList(tags, rawTags[i]["attributes"]["name"].values.first);
+    }
+
+    chapters = [];
+
+    return buildConcrete({
+        title: title,
+        cover: cover,
+        tags: tags,
+        chapters: getChapters({
+            uid: data["id"]
+        })
+    });
+}
+
+func getConcrete(uid) {
+
+    result = httpGet({
+        url: "https://api.mangadex.org/manga/uid",
+        params: {},
+        paths: {
+            uid: uid
+        }
+    });
+
+    body = jsonDecode(result["body"]);
+
+    concrete = handleConcreteView({
+        data: body["data"]
+    });
+
+    return concrete;
+}
+
+func getConfigInfo() {
+    return buildConfigInfo({
+        name: "MangaDex",
+        logoUrl: "https://mangadex.org/_nuxt/ddb5721c5458b5edc9d6782a5f107119.svg",
+        nsfw: false,
+        language: "Mixed"
+    });
+}
+
+
+func main() {
+//    gallery = getGallery({
+//        limit: 1,
+//        page: 2,
+//        query: ""
+//    });
+
+//    concrete = getConcrete({
+//     uid: gallery[0]["uid"]
+//    });
+
+    // concrete = getChapters({
+    //     uid: "4076579f-0d95-4f30-9c5f-7f230fa205d9"
+    // });
+    concrete = getPages({
+        uid: "255412eb-67df-4058-a4a5-fc3252676f5f"
+    });
+
+//    print(gallery);
+   print(concrete);
+
+}
