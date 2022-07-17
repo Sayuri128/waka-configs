@@ -103,6 +103,10 @@ func getChaptersData(uid, offset) {
 func handleChapterItem(chapter) {
     uid = chapter["id"];
     title = chapter["attributes"]["title"];
+    if(title == null) {
+        title = "";
+    }
+
     timestamp = chapter["attributes"]["publishAt"];
     return buildChapter({
         uid: uid,
@@ -118,12 +122,13 @@ func getChapters(uid)  {
         uid: uid
     });
     result = jsonDecode(firstChapters["body"]);
+    data = result["data"];
 
     chapters = [];
 
-    for(i = 0; chapters.length < 100; i = i + 1) {
+    for(i = 0; i < data.length; i = i + 1) {
         addToList(chapters, handleChapterItem({
-            chapter: result["data"][i]
+            chapter: data[i]
         }));
     }
 
@@ -155,7 +160,7 @@ func handleConcreteView(data) {
 
     title = buildTitle({
         original: originalTitle,
-        pretty: prettyTitle
+        pretty: ""
     });
 
     cover = getCover({
