@@ -55,10 +55,9 @@ func handleMangaItem(manga) {
     });
 }
 
-func getGallery(limit, page, query) {
+func getGallery(page, query) {
 
     params = {
-        limit: limit,
         offset: limit * page
     };
 
@@ -215,7 +214,6 @@ func getConfigInfo() {
 
 func main() {
 //    gallery = getGallery({
-//        limit: 1,
 //        page: 2,
 //        query: ""
 //    });
