@@ -105,7 +105,15 @@ func handleChapterItem(chapter) {
 
     attr = chapter["attributes"];
 
-    prefix = "Volume " + attr["volume"] + " Chapter " + attr["chapter"];
+    prefix = "";
+
+    if(attr["volume"] != null) {
+        prefix = prefix + "Volume " + attr["volume"];
+    }
+    if(attr["chapter"] != null) {
+       prefix = prefix + " Chapter " + attr["chapter"];
+    }
+
     title = chapter["attributes"]["title"];
     if(title == null) {
         title = prefix;
@@ -152,6 +160,14 @@ func getPages(uid) {
     });
 
     body = jsonDecode(result["body"]);
+
+    if(body["result"] != "ok") {
+       return buildPages({
+           uid: uid,
+           value: []
+       });
+    }
+
     data = body["chapter"]["data"];
 
     value = [];
