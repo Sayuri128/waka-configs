@@ -259,7 +259,8 @@ func getConfigInfo() {
         name: "MangaDex",
         logoUrl: "https://mangadex.org/_nuxt/ddb5721c5458b5edc9d6782a5f107119.svg",
         nsfw: false,
-        language: "Eng"
+        language: "Eng",
+        version: 1
     });
 }
 
