@@ -92,7 +92,8 @@ func getChaptersData(uid, offset) {
         url: "https://api.mangadex.org/manga/mangaId/feed",
         params: {
             limit: 100,
-            offset: offset
+            offset: offset,
+            translatedLanguage: ["en"]
         },
         paths: {
             mangaId: uid
@@ -252,7 +253,7 @@ func getConfigInfo() {
         name: "MangaDex",
         logoUrl: "https://mangadex.org/_nuxt/ddb5721c5458b5edc9d6782a5f107119.svg",
         nsfw: false,
-        language: "Mixed"
+        language: "Eng"
     });
 }
 
