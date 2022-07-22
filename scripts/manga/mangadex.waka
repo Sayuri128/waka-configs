@@ -258,7 +258,7 @@ func getConfigInfo() {
 
     availableYears = [];
 
-    for(i = 1950; i < 2022; i = i + 1) {
+    for(i = 1950; i <= 2022; i = i + 1) {
         addToList(availableYears, i);
     }
 
