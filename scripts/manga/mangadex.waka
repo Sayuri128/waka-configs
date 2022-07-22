@@ -255,23 +255,95 @@ func getConcrete(uid) {
 }
 
 func getConfigInfo() {
+
+    availableYears = [];
+
+    for(i = 1950; i < 2022; i = i + 1) {
+        addToList(availableYears, i);
+    }
+
     return buildConfigInfo({
         name: "MangaDex",
         logoUrl: "https://mangadex.org/_nuxt/ddb5721c5458b5edc9d6782a5f107119.svg",
         nsfw: false,
         language: "Eng",
-        version: 1
+        version: 1,
+        filters: [
+            buildMultipleOfAny({
+                paramName: "Authors",
+                param: "authors"
+            }),
+            buildMultipleOfAny({
+                paramName: "Artists",
+                param: "artists"
+            }),
+            buildOneOfMultiple({
+                paramName: "Year of release",
+                param: "year",
+                values: availableYears
+            }),
+            buildMultipleOfAny({
+                paramName: "Tags",
+                param: "includedTags"
+            }),
+            buildSwitcher({
+                paramName: "Tags mode",
+                param: "includedTagsMode",
+                onValue: "AND",
+                offValue: "OR"
+            }),
+            buildMultipleOfAny({
+                paramName: "Exclude tags",
+                param: "excludedTags"
+            }),
+            buildSwitcher({
+                paramName: "Exclude tags mode",
+                param: "excludedTagsMode",
+                onValue: "AND",
+                offValue: "OR"
+            }),
+            buildMultipleOfMultiple({
+                paramName: "Status",
+                param: "status",
+                values: [
+                    ["ongoing", "Ongoing"],
+                    ["completed", "Completed"],
+                    ["hiatus", "Hiatus"],
+                    ["cancelled", "Cancelled"],
+                ]
+            }),
+            buildMultipleOfMultiple({
+                paramName: "Base genre",
+                param: "publicationDemographic",
+                values: [
+                    ["shounen", "Shounen"],
+                    ["shoujo", "Shoujo"],
+                    ["josei", "Josei"],
+                    ["seinen", "Seinen"],
+                    ["none", "None"],
+                ]
+            }),
+            buildMultipleOfMultiple({
+                paramName: "Content rating",
+                param: "contentRaing",
+                values: [
+                    ["safe", "Safe"],
+                    ["suggestive", "Suggestive"],
+                    ["erotica", "Erotica"]
+                ]
+            })
+        ]
     });
 }
 
 
 func main() {
-    gallery = getGallery({
-        page: 2,
-        query: ""
-    });
+    // gallery = getGallery({
+    //     page: 2,
+    //     query: ""
+    // });
 
-    print(gallery);
+    // print(gallery);
 
 //    concrete = getConcrete({
 //     uid: gallery[0]["uid"]
@@ -280,13 +352,12 @@ func main() {
     // concrete = getChapters({
     //     uid: "4076579f-0d95-4f30-9c5f-7f230fa205d9"
     // });
-    concrete = getPages({
-        uid: "255412eb-67df-4058-a4a5-fc3252676f5f"
-    });
+    configInfo = getConfigInfo();
+
+    print(configInfo);
 
    // print(concrete["value"]);
 
 //    print(gallery);
-   print(concrete);
 
 }
