@@ -57,7 +57,7 @@ func handleMangaItem(manga) {
 
 func getGallery(page, query, filters) {
 
-    limit = 2;
+    limit = 20;
 
     params = {
         limit: limit,
