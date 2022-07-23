@@ -55,13 +55,31 @@ func handleMangaItem(manga) {
     });
 }
 
-func getGallery(page, query) {
+func getGallery(page, query, filters) {
 
-    limit = 12;
+    limit = 2;
 
     params = {
+        limit: limit,
         offset: limit * page
     };
+
+    for(i = 0; i < filters.length; i = i + 1) {
+        filterData = filters[i];
+        filter = filterData["filter"];
+        if(filter["type"] == "ONE_OF_MULTIPLE") {
+            params[filter.param] = filterData["selected"];
+        } else if(filter["type"] == "ONE_OF_ANY") {
+            params[filter.param] = filterData["selected"];
+        } else if(filter["type"] == "MULTIPLE_OF_ANY") {
+            params[filter.param] = filterData["selected"];
+        } else if(filter["type"] == "MULTIPLE_OF_MULTIPLE") {
+            params[filter.param] = filterData["selected"];
+        } else if(filter["type"] == "SWITCHER") {
+            params[filter.param] = filterData["on"];
+        }
+    }
+
 
     if(query != "") {
         params["title"] = query;
