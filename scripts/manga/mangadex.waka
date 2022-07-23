@@ -351,7 +351,7 @@ func getConfigInfo() {
             }),
             buildMultipleOfMultiple({
                 paramName: "Content rating",
-                param: "contentRaing",
+                param: "contentRating",
                 values: [
                     ["safe", "Safe"],
                     ["suggestive", "Suggestive"],
