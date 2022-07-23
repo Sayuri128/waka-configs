@@ -331,6 +331,10 @@ func getConfigInfo() {
                     ["suggestive", "Suggestive"],
                     ["erotica", "Erotica"]
                 ]
+            }),
+            buildOneOfAny({
+                paramName: "Test",
+                param: "test"
             })
         ]
     });
