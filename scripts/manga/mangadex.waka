@@ -74,11 +74,19 @@ func getGallery(page, query, filters) {
         } else if(filter["type"] == "MULTIPLE_OF_ANY") {
             params[filter.param] = filterData["selected"];
         } else if(filter["type"] == "MULTIPLE_OF_MULTIPLE") {
-            params[filter.param] = filterData["selected"];
+            selected = [];
+
+            for(j = 0; j < filterData["selected"].length; j = j + 1) {
+                addToList(selected, filterData["selected"][j][0]);
+            }
+
+            params[filter.param] = selected;
         } else if(filter["type"] == "SWITCHER") {
             params[filter.param] = filterData["on"];
         }
     }
+
+    print(params);
 
 
     if(query != "") {
