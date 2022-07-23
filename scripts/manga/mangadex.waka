@@ -82,7 +82,13 @@ func getGallery(page, query, filters) {
 
             params[filter.param] = selected;
         } else if(filter["type"] == "SWITCHER") {
-            params[filter.param] = filterData["on"];
+            on = filterData["on"];
+            if(on) {
+                params[filter.param] = "AND"
+            } else {
+                params[filter.param] = "OR"
+            }
+            
         }
     }
 
