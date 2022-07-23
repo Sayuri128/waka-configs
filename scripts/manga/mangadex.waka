@@ -86,9 +86,6 @@ func getGallery(page, query, filters) {
         }
     }
 
-    print(params);
-
-
     if(query != "") {
         params["title"] = query;
     }
