@@ -255,6 +255,7 @@ func handleConcreteView(data) {
     chapters = [];
 
     return buildConcrete({
+        uid: data["id"],
         title: title,
         cover: cover,
         tags: tags,
