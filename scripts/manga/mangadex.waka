@@ -362,7 +362,8 @@ func getConfigInfo() {
                     ["erotica", "Erotica"]
                 ]
             })
-        ]
+        ],
+        protectorConfig: null
     });
 }
 

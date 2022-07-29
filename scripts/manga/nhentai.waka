@@ -1,0 +1,24 @@
+import waka_json;
+import waka_http;
+import waka_collections;
+import waka_models;
+
+func getConfigInfo() {
+    return buildConfigInfo({
+        name: "NHentai",
+        logoUrl: "https://nhentai.to/img/logo.650c98bbb08e.svg",
+        baseUrl: "https://nhentai.net",
+        nsfw: true,
+        language: "Mixed",
+        version: 1,
+        filters: [],
+        protectorConfig: buildProtectorConfig({
+            pingUrl: "https://nhentai.net/api/galleries/all",
+            needToLogin: false
+        })
+    });
+}
+
+func passProtector(headers) {
+    useHeaders(headers);
+}
