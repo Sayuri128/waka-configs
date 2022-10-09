@@ -3,11 +3,22 @@ import waka_http;
 import waka_collections;
 import waka_models;
 
+func getGallery(page, query) {
+    res = httpGet({
+        url: "https://nhentai.net/api/galleries/all",
+        params: {},
+        paths: {}
+    });
+
+    print(res);
+
+    return [];
+}
+
 func getConfigInfo() {
     return buildConfigInfo({
         name: "NHentai",
         logoUrl: "https://nhentai.to/img/logo.650c98bbb08e.svg",
-        baseUrl: "https://nhentai.net",
         nsfw: true,
         language: "Mixed",
         version: 1,
@@ -20,5 +31,5 @@ func getConfigInfo() {
 }
 
 func passProtector(headers) {
-    useHeaders(headers);
+    useHeaders({headers: headers});
 }
