@@ -2,27 +2,163 @@ import waka_json;
 import waka_http;
 import waka_collections;
 import waka_models;
+import waka_converter;
+import waka_html;
 
-func getGallery(page, query) {
-    res = httpGet({
-        url: "https://nhentai.net/api/galleries/all",
+func handleMangaItem(manga) {
+    uid = manga["id"];
+    title = manga["title"].values.first;
+
+    cover = "https://t7.nhentai.net/galleries/" + manga["media_id"] + "/thumb";
+
+    if(manga["images"]["thumbnail"]["t"] == "p") {
+        cover = cover + ".png";
+    } else {
+        cover = cover + ".jpg";
+    }
+
+    return buildGallery({
+        uid: parseString(uid),
+        title: title,
+        cover: cover,
+        data: manga
+    });
+}
+
+
+func getGallery(page, query, filters) {
+    result = httpGet({
+        url: "https://nhentai.net/api/galleries/all?" + "page=" + parseString(page) + "&limit=25",
         params: {},
         paths: {}
     });
 
-    print(res);
+    decoded = jsonDecode(result["body"]);
+    data = decoded["result"];
 
-    return [];
+    mangas = [];
+
+    for(i = 0; i < data.length; i = i + 1) {
+        addToList(mangas, handleMangaItem({
+            manga: data[i]
+        }));
+    }
+
+    return mangas;
+}
+
+func getPages(uid) {
+
+    result = httpGet({
+        url: "https://nhentai.net/g/" + uid + "/",
+        params: {},
+        paths: {}
+    });
+
+    document = createWakaHtmlParser(result["body"]);
+
+    thumbContainers = document.getElementsByClassName("thumb-container");
+
+    value = [];
+
+    for(i = 0; i < thumbContainers.length; i = i + 1) {
+        imgUrl = thumbContainers[i].getElementsByTagName("img")[0].attributes["data-src"];
+        value.add(imgUrl
+                .replaceAll(parseString(i + 1) + "t", parseString(i + 1))
+                .replaceAll("t7", "i3")
+                .replaceAll("t3", "i3")
+                .replaceAll("t5", "i3")
+                .replaceAll("t4", "i3")
+                .replaceAll("t2", "i3")
+                );
+    }
+
+    return buildPages({ uid: uid,
+                        value: value });
+
+}
+
+func getConcrete(uid) {
+
+    result = httpGet({
+        url: "https://nhentai.net/g/" + uid + "/",
+        params: {},
+        paths: {}
+    });
+
+    document = createWakaHtmlParser(result["body"]);
+
+    info = document.getElementById("info");
+    titleElements = document.getElementsByClassName("title");
+
+    original = titleElements[0].text;
+    pretty = "";
+
+    if(titleElements.length > 1) {
+        pretty = titleElements[1].text;
+    }
+
+    title = buildTitle({
+        original: original,
+        pretty: pretty
+    });
+
+    coverElement = document.getElementById("cover");
+    img = coverElement.getElementsByTagName("img");
+    firstImg = img[0];
+    cover = firstImg.attributes["data-src"];
+
+    tags = [];
+
+    rawTags = document.getElementById("tags");
+    rawTags = rawTags.getElementsByClassName("tags");
+
+    for(i = 0; i < rawTags.length; i = i + 1) {
+        elem = rawTags[i];
+        elems = elem.getElementsByClassName("name");
+        if(elems.length > 0) {
+            for(j = 0; j < elems.length - 1; j = j + 1) {
+                addToList(tags, elems[j].text);
+            }
+        }
+    }
+
+    chapters = [];
+
+    addToList(chapters, buildChapter({uid: uid, title: "Chapter 1", timestamp: ""}));
+
+    description = "";
+
+    description = description + "English title: " + titleElements[0].text + "\n";
+    description = description + "Original title: " + titleElements[1].text + "\n";
+    description = description + "Pages: " + tags.last + "\n";
+
+    favoritedBy = document.getElementsByClassName("buttons")[0].getElementsByClassName("nobold")[0].text;
+    favoritedBy = favoritedBy.substring(1, favoritedBy.length - 1);
+
+    description = description + "Favoried by: " + favoritedBy + "\n";
+
+    description = description + "ID: " + document.getElementById("gallery_id").text;
+
+    return buildConcrete({
+        uid: uid,
+        title: title,
+        description: description,
+        cover: cover,
+        tags: tags,
+        chapters: chapters
+    });
 }
 
 func getConfigInfo() {
     return buildConfigInfo({
-        name: "NHentai",
-        logoUrl: "https://nhentai.to/img/logo.650c98bbb08e.svg",
+        name: "nhentai",
+        logoUrl: "https://i.kym-cdn.com/entries/icons/facebook/000/026/029/n.jpg",
         nsfw: true,
         language: "Mixed",
         version: 1,
         filters: [],
+        searchAvailable: false,
         protectorConfig: buildProtectorConfig({
             pingUrl: "https://nhentai.net/api/galleries/all",
             needToLogin: false
@@ -31,5 +167,9 @@ func getConfigInfo() {
 }
 
 func passProtector(headers) {
+    headers["Cookie"] = headers["cookie"];
+    headers["Accept"] = "*/*";
+    headers["Connection"] = "keep-alive";
+
     useHeaders({headers: headers});
 }

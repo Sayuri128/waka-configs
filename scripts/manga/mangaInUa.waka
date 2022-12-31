@@ -1,0 +1,177 @@
+import waka_json;
+import waka_http;
+import waka_collections;
+import waka_models;
+import waka_converter;
+import waka_html;
+
+func getGallery(page, query, filters) {
+
+    result = null;
+
+    if(query == "") {
+        result = httpGet({
+            url: "https://manga.in.ua/mangas/page/" + parseString(page),
+            params: {},
+            paths: {}
+        });
+    } else {
+        result = httpPost({
+            url: "https://manga.in.ua/index.php",
+            params: {
+                do: "search",
+                subaction: "search",
+                full_search: "0",
+                story: query,
+                search_start: page
+            },
+            paths: {},
+            body: {}
+        });
+    }
+
+
+    document = createWakaHtmlParser(result["body"]);
+
+    movie = document.getElementsByClassName("movie");
+
+    items = [];
+
+    for(i = 0; i < movie.length - 1; i = i + 1) {
+        e = movie[i];
+
+        uid = "";
+        title = "";
+        cover = "";
+
+        if(e.getElementsByTagName("h3")[0] == null ||
+           e.getElementsByTagName("h3")[0].getElementsByTagName("a")[0] == null ||
+           e.getElementsByTagName("h3")[0].getElementsByTagName("a")[0].attributes["href"] == null) {
+           uid = "";
+        } else {
+            uid = e.getElementsByTagName("h3")[0].getElementsByTagName("a")[0].attributes["href"];
+        }
+
+        if(e.getElementsByTagName("h3")[0] == null ||
+            e.getElementsByTagName("h3")[0].getElementsByTagName("a")[0] == null) {
+            title = "";
+        } else {
+            title = e.getElementsByTagName("h3")[0].getElementsByTagName("a")[0].text;
+        }
+        
+        if (e.getElementsByTagName("figure")[0] == null ||
+            e.getElementsByTagName("figure")[0].getElementsByTagName("img")[0] == null ||
+            e.getElementsByTagName("figure")[0]
+                .getElementsByTagName("img")[0].attributes["data-src"] == null
+        ) {
+            cover = "";
+        } else {
+            dataSrc = e.getElementsByTagName("figure")[0]
+                .getElementsByTagName("img")[0].attributes["data-src"];
+            if(dataSrc == null) {
+                cover = "https://manga.in.ua/" + e.getElementsByTagName("figure")[0]
+                .getElementsByTagName("img")[0].attributes["src"];
+            } else {
+                cover = "https://manga.in.ua/" + dataSrc;
+            }
+        }
+
+        items.add(buildGallery({
+                                  uid: uid,
+                                  title: title,
+                                  cover: cover,
+                                  data: {}
+                              }));
+    }
+
+    return items;
+
+}
+
+func getConcrete(uid) {
+
+    result = httpGet({
+        url: uid,
+        params: {},
+        paths: {}
+    });
+
+    document = createWakaHtmlParser(result["body"]);
+
+    chaptersTags = document.getElementsByClassName("ltcitems");
+    chapters = [];
+
+    for(i = 0; i < chaptersTags.length; i = i + 1) {
+        chapterUid = chaptersTags[i].getElementsByClassName("forfastnavigation")[0].attributes["href"];
+        title = chaptersTags[i].getElementsByClassName("forfastnavigation")[0].text;
+        timestamp = chaptersTags[i].getElementsByClassName("ltcright")[0].text;
+        chapters.add(buildChapter({uid: chapterUid, title: title, timestamp: timestamp}));
+    }
+
+    cover = "https://manga.in.ua" + document.getElementsByClassName("item__full-sidebar--poster")[0].getElementsByTagName("img")[0].attributes["src"];
+
+    tagsDocs = document.getElementsByClassName("item__full-sidebar--section")[1].getElementsByClassName("item__full-sideba--header");
+
+    tags = [];
+
+    for(i = 0; i < tagsDocs.length; i = i + 1) {
+        e = tagsDocs[i];
+        if(e.text.contains("Жанри")) {
+            genresDocs = e.getElementsByTagName("a");
+            for(j = 0; j < genresDocs.length; j = j + 1) {
+                tags.add(genresDocs[j].text);
+            }
+        }
+    }
+
+    description = document.getElementsByClassName("item__full-description")[0].text;
+
+
+    return buildConcrete({
+        uid: uid,
+        title: buildTitle({
+            original: "",
+            pretty: document.getElementsByClassName("UAname")[0].text
+        }),
+        description: description,
+        cover: cover,
+        tags: tags,
+        chapters: chapters
+    });
+}
+
+func getPages(uid) {
+
+    result = httpGet({
+        url: uid,
+        params: {},
+        paths: {}
+    });
+
+    document = createWakaHtmlParser(result["body"]);
+
+    value = [];
+
+    images = document.getElementsByClassName("xfieldimagegallery loadcomicsimages")[0].getElementsByTagName("img");
+
+    for(i = 0; i < images.length; i = i + 1) {
+       value.add("https://manga.in.ua" + images[i].attributes["data-src"]);
+    }
+
+    return buildPages({ uid: uid,
+                        value: value });
+
+}
+
+func getConfigInfo() {
+    return buildConfigInfo({
+        name: "Manga/in/UA",
+        logoUrl: "https://manga.in.ua/templates/MGinUA/images/logo.png",
+        nsfw: false,
+        language: "Українська",
+        version: 1,
+        filters: [],
+        searchAvailable: true,
+        protectorConfig: null
+    });
+}

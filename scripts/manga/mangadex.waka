@@ -2,6 +2,7 @@ import waka_json;
 import waka_http;
 import waka_collections;
 import waka_models;
+import waka_date;
 
 func getCover(coverArtUid, mangaId) {
 
@@ -51,7 +52,8 @@ func handleMangaItem(manga) {
     return buildGallery({
         uid: uid,
         title: title,
-        cover: cover
+        cover: cover,
+        data: manga
     });
 }
 
@@ -155,7 +157,18 @@ func handleChapterItem(chapter) {
         title = prefix + " | " + title;
     }
 
-    timestamp = chapter["attributes"]["publishAt"];
+    rawDate = chapter["attributes"]["publishAt"];
+
+    parser = createDateFormatter("yyyy-MM-dd hh:mm");
+    date = parseDate(rawDate);
+
+    timestamp = null;
+
+    if(date != null) {
+        timestamp = parser.format(date);
+    } else {
+        timestamp = rawDate;
+    }
 
 
     return buildChapter({
@@ -237,6 +250,12 @@ func handleConcreteView(data) {
         pretty: ""
     });
 
+    description = data["attributes"]["description"].values.first;
+
+    if(description == null) {
+        description = "";
+    }
+
     cover = getCover({
         coverArtUid: getCoverId({
             data: data["relationships"]
@@ -257,6 +276,7 @@ func handleConcreteView(data) {
     return buildConcrete({
         uid: data["id"],
         title: title,
+        description: description,
         cover: cover,
         tags: tags,
         chapters: getChapters({
@@ -294,25 +314,26 @@ func getConfigInfo() {
 
     return buildConfigInfo({
         name: "MangaDex",
-        logoUrl: "https://mangadex.org/_nuxt/ddb5721c5458b5edc9d6782a5f107119.svg",
+        logoUrl: "https://mangadex.org/_nuxt/fe9305523f3efa4185ff8ebcf401d17b.svg",
         nsfw: false,
         language: "Eng",
         version: 1,
+        searchAvailable: true,
         filters: [
-            buildMultipleOfAny({
+            buildManyOfAny({
                 paramName: "Authors",
                 param: "authors"
             }),
-            buildMultipleOfAny({
+            buildManyOfAny({
                 paramName: "Artists",
                 param: "artists"
             }),
-            buildOneOfMultiple({
+            buildOneOfMany({
                 paramName: "Year of release",
                 param: "year",
                 values: availableYears
             }),
-            buildMultipleOfAny({
+            buildManyOfAny({
                 paramName: "Tags",
                 param: "includedTags"
             }),
@@ -322,7 +343,7 @@ func getConfigInfo() {
                 onValue: "AND",
                 offValue: "OR"
             }),
-            buildMultipleOfAny({
+            buildManyOfAny({
                 paramName: "Exclude tags",
                 param: "excludedTags"
             }),
@@ -332,7 +353,7 @@ func getConfigInfo() {
                 onValue: "AND",
                 offValue: "OR"
             }),
-            buildMultipleOfMultiple({
+            buildManyOfMany({
                 paramName: "Status",
                 param: "status",
                 values: [
@@ -342,7 +363,7 @@ func getConfigInfo() {
                     ["cancelled", "Cancelled"],
                 ]
             }),
-            buildMultipleOfMultiple({
+            buildManyOfMany({
                 paramName: "Base genre",
                 param: "publicationDemographic",
                 values: [
@@ -353,7 +374,7 @@ func getConfigInfo() {
                     ["none", "None"],
                 ]
             }),
-            buildMultipleOfMultiple({
+            buildManyOfMany({
                 paramName: "Content rating",
                 param: "contentRating",
                 values: [
