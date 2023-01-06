@@ -30,7 +30,8 @@ func getGallery(page, query, filters) {
     result = httpGet({
         url: "https://nhentai.net/api/galleries/all?" + "page=" + parseString(page) + "&limit=25",
         params: {},
-        paths: {}
+        paths: {},
+        throughWeb: false
     });
 
     decoded = jsonDecode(result["body"]);
@@ -52,7 +53,8 @@ func getPages(uid) {
     result = httpGet({
         url: "https://nhentai.net/g/" + uid + "/",
         params: {},
-        paths: {}
+        paths: {},
+        throughWeb: false
     });
 
     document = createWakaHtmlParser(result["body"]);
@@ -83,7 +85,8 @@ func getConcrete(uid) {
     result = httpGet({
         url: "https://nhentai.net/g/" + uid + "/",
         params: {},
-        paths: {}
+        paths: {},
+        throughWeb: false
     });
 
     document = createWakaHtmlParser(result["body"]);
@@ -125,7 +128,7 @@ func getConcrete(uid) {
 
     chapters = [];
 
-    addToList(chapters, buildChapter({uid: uid, title: "Chapter 1", timestamp: ""}));
+    addToList(chapters, buildChapter({uid: uid, title: "Chapter 1", timestamp: "", data: {}}));
 
     description = "";
 
@@ -161,13 +164,15 @@ func getConfigInfo() {
         searchAvailable: false,
         protectorConfig: buildProtectorConfig({
             pingUrl: "https://nhentai.net/api/galleries/all",
-            needToLogin: false
+            needToLogin: false,
+            inAppWebBrowserInterceptor: false
         })
     });
 }
 
-func passProtector(headers) {
-    headers["Cookie"] = headers["cookie"];
+func passProtector(data) {
+    headers = data["headers"];
+
     headers["Accept"] = "*/*";
     headers["Connection"] = "keep-alive";
 

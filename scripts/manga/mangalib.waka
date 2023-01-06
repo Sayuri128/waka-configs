@@ -1,0 +1,261 @@
+import waka_json;
+import waka_http;
+import waka_collections;
+import waka_models;
+import waka_converter;
+import waka_html;
+
+func getGallery(page, query, filters) {
+
+    name = null;
+
+    if(query.isNotEmpty) {
+        name = query;
+    }
+
+    result = httpPost({
+        url: "https://mangalib.me/api/list",
+        params: {},
+        paths: {},
+        body: {
+            sort: "rate",
+            dir: "desc",
+            page: page,
+            name: name,
+            site_id: "1",
+            caution_list: [
+                "Отсутствует",
+                "16+",
+                "18+"
+            ]
+        },
+        throughWeb: false
+    });
+
+    decoded = jsonDecode(result["body"]);
+
+    print("Current page: " + parseString(decoded.items.current_page));
+
+    data = decoded.items.data;
+
+
+    result = [];
+
+    for(i = 0; i < data.length; i = i + 1) {
+
+        item = data[i];
+
+        uid = item["slug"];
+        title = item["rus_name"];
+        cover = item["covers"]["default"];
+
+        result.add(buildGallery({
+            uid: parseString(uid),
+            title: title,
+            cover: cover,
+            data: item
+        }));
+
+    }
+
+    return result;
+
+}
+
+func getConcrete(uid) {
+
+    result = httpGet({
+        url: "https://mangalib.me/" + uid,
+        params: {},
+        paths: {},
+        throughWeb: true
+    });
+
+    document = createWakaHtmlParser(result["body"]);
+
+    data = executeJsScript({code: "return window.__DATA__"});
+
+    chaptersList = data.chapters.list;
+
+    chapters = [];
+
+    branches = data.chapters.branches;
+    branchId = null;
+
+    if(branches.isNotEmpty) {
+        branchId = branches[0].id;
+    }
+
+    for(i = 0; i < chaptersList.length; i = i + 1) {
+        chapter = chaptersList[i];
+        chapterName = "";
+        chapterNumber = "";
+        chapterVolume = 1;
+
+        if(chapter.chapter_name != null) {
+            chapterName = chapter.chapter_name;
+        }
+
+        if(chapter.chapter_number != null) {
+            chapterNumber = chapter.chapter_number;
+        }
+
+        if(chapter.chapter_volume != null) {
+            chapterVolume = chapter.chapter_volume;
+        }
+
+
+
+        chapter["slug"] = uid;
+        chapter["id"] = data.user.id;
+        chapter["bid"] = branchId;
+
+        if(chapter.branch_id == branchId) {
+            chapters.add(buildChapter({
+                        uid: chapter.chapter_slug,
+                        title: "Том " + parseString(chapterVolume) + " Глава " + chapterNumber  + " " + chapterName,
+                        timestamp: chapter.chapter_created_at,
+                        data: chapter
+                    }));
+        }
+    }
+
+    description = document.getElementsByClassName("media-description__text")[0].text;
+
+    cover = document.getElementsByClassName("media-sidebar__cover")[0].getElementsByTagName("img")[0].attributes["src"];
+
+    tags = [];
+
+    tagsHtml = document.getElementsByClassName("media-tags")[0].getElementsByTagName("a");
+
+    for(i = 0; i < tagsHtml.length; i = i + 1) {
+        tagHtml = tagsHtml[i];
+        tags.add(tagHtml.text);
+    }
+
+    return buildConcrete({
+        uid: uid,
+        title: buildTitle({
+            original: data.manga.name,
+            pretty: data.manga.rusName
+        }),
+        description: description,
+        cover: cover,
+        tags: tags,
+        chapters: chapters
+    });
+}
+
+func getPages(uid, data) {
+
+    chapter = data;
+    chapterName = "";
+    chapterNumber = "";
+    chapterVolume = 1;
+
+    if(chapter.chapter_name != null) {
+        chapterName = chapter.chapter_name;
+    }
+
+    if(chapter.chapter_number != null) {
+        chapterNumber = chapter.chapter_number;
+    }
+
+    if(chapter.chapter_volume != null) {
+        chapterVolume = chapter.chapter_volume;
+    }
+
+    url = "https://mangalib.me/" + chapter["slug"] + "/v" + parseString(chapterVolume) + "/c" + chapterNumber;
+
+    params = {
+        ui: chapter["id"]
+    };
+
+    if(chapter["bid"] != null) {
+        params["bid"]= chapter["bid"];
+    }
+
+    result = httpGet({
+        url: url,
+        params: params,
+        paths: {},
+        throughWeb: true
+    });
+
+    pages = executeJsScript({code: "return window.__pg"});
+
+    value = [];
+
+    for(i = 0; i < pages.length; i = i + 1) {
+        page = pages[i];
+        pageImageUrl = "https://img33.imgslib.link//manga/" + chapter["slug"] + "/chapters/" + chapter.chapter_slug + "/" + page.u;
+        value.add(pageImageUrl);
+    }
+
+    return buildPages({ uid: uid,
+                        value: value });
+
+}
+
+
+func getConfigInfo() {
+    return buildConfigInfo({
+        name: "MangaLib",
+        logoUrl: "https://mangalib.me/icons/android-icon-192x192.png?333",
+        nsfw: false,
+        language: "Russian",
+        version: 1,
+        filters: [],
+        searchAvailable: true,
+        protectorConfig: buildProtectorConfig({
+            pingUrl: "https://mangalib.me/manga-list",
+            needToLogin: true,
+            inAppWebBrowserInterceptor: true
+        })
+    });
+}
+
+func passProtector(data) {
+
+    result = httpGet({
+        url: "https://mangalib.me/manga-list",
+        params: {},
+        paths: {},
+        throughWeb: true
+    });
+
+    resultData = result["data"];
+
+    headers = resultData["headers"];
+
+    headers["x-xsrf-token"] = resultData["cookies-raw"]["XSRF-TOKEN"].replaceAll("%3D", "=");
+    headers["x-requested-with"] = "XMLHttpRequest";
+    headers["Content-Type"] = "application/json;charset=UTF-8";
+
+    document = createWakaHtmlParser(result["body"]);
+
+    metas = document.getElementsByTagName("meta");
+
+
+    for(i = 0; i < metas.length; i = i + 1) {
+       e = metas[i];
+       if(e.attributes["name"] == "_token") {
+          headers["x-csrf-token"] = e.attributes["content"];
+       }
+    }
+
+    print("x-csrf-token");
+    print(headers["x-csrf-token"]);
+    print("x-xsrf-token");
+    print(headers["x-xsrf-token"]);
+    print("user-agent");
+    print(headers["user-agent"]);
+    print("cookie");
+    print(headers["cookie"]);
+
+    useHeaders({headers: headers});
+}
+
+func passWebBrowserInterceptorController(controller) {
+    registerInterceptorController(controller);
+}

@@ -13,7 +13,8 @@ func getCover(coverArtUid, mangaId) {
         params: {},
         paths: {
             coverArtId: coverArtUid
-        }
+        },
+        throughWeb: false
     });
 
     decodedCover = jsonDecode(coverResult["body"]);
@@ -101,7 +102,8 @@ func getGallery(page, query, filters) {
     result = (httpGet({
         url: "https://api.mangadex.org/manga",
         params: params,
-        paths: {}
+        paths: {},
+        throughWeb: false
     }));
 
     decoded = jsonDecode(result["body"]);
@@ -132,7 +134,8 @@ func getChaptersData(uid, offset) {
         },
         paths: {
             mangaId: uid
-        }
+        },
+        throughWeb: false
     });
 }
 
@@ -174,7 +177,8 @@ func handleChapterItem(chapter) {
     return buildChapter({
         uid: uid,
         title: title,
-        timestamp: timestamp
+        timestamp: timestamp,
+        data: {}
     });
 }
 
@@ -214,7 +218,8 @@ func getPages(uid) {
         params: {},
         paths: {
             chapterUid: uid
-        }
+        },
+        throughWeb: false
     });
 
     body = jsonDecode(result["body"]);
@@ -292,7 +297,8 @@ func getConcrete(uid) {
         params: {},
         paths: {
             uid: uid
-        }
+        },
+        throughWeb: false
     });
 
     body = jsonDecode(result["body"]);

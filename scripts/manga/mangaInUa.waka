@@ -13,7 +13,8 @@ func getGallery(page, query, filters) {
         result = httpGet({
             url: "https://manga.in.ua/mangas/page/" + parseString(page),
             params: {},
-            paths: {}
+            paths: {},
+            throughWeb: true
         });
     } else {
         result = httpPost({
@@ -26,10 +27,10 @@ func getGallery(page, query, filters) {
                 search_start: page
             },
             paths: {},
-            body: {}
+            body: {},
+            throughWeb: false
         });
     }
-
 
     document = createWakaHtmlParser(result["body"]);
 
@@ -58,14 +59,16 @@ func getGallery(page, query, filters) {
         } else {
             title = e.getElementsByTagName("h3")[0].getElementsByTagName("a")[0].text;
         }
-        
-        if (e.getElementsByTagName("figure")[0] == null ||
+
+        if(e.getElementsByTagName("figure").isEmpty) {
+            cover = "";
+        } else if (e.getElementsByTagName("figure")[0] == null ||
             e.getElementsByTagName("figure")[0].getElementsByTagName("img")[0] == null ||
-            e.getElementsByTagName("figure")[0]
-                .getElementsByTagName("img")[0].attributes["data-src"] == null
+            e.getElementsByTagName("figure")[0].getElementsByTagName("img")[0].attributes["data-src"] == null
         ) {
             cover = "";
         } else {
+            print("GetDataSrc");
             dataSrc = e.getElementsByTagName("figure")[0]
                 .getElementsByTagName("img")[0].attributes["data-src"];
             if(dataSrc == null) {
@@ -93,7 +96,8 @@ func getConcrete(uid) {
     result = httpGet({
         url: uid,
         params: {},
-        paths: {}
+        paths: {},
+        throughWeb: true
     });
 
     document = createWakaHtmlParser(result["body"]);
@@ -105,7 +109,7 @@ func getConcrete(uid) {
         chapterUid = chaptersTags[i].getElementsByClassName("forfastnavigation")[0].attributes["href"];
         title = chaptersTags[i].getElementsByClassName("forfastnavigation")[0].text;
         timestamp = chaptersTags[i].getElementsByClassName("ltcright")[0].text;
-        chapters.add(buildChapter({uid: chapterUid, title: title, timestamp: timestamp}));
+        chapters.add(buildChapter({uid: chapterUid, title: title, timestamp: timestamp, data: {}}));
     }
 
     cover = "https://manga.in.ua" + document.getElementsByClassName("item__full-sidebar--poster")[0].getElementsByTagName("img")[0].attributes["src"];
@@ -145,7 +149,8 @@ func getPages(uid) {
     result = httpGet({
         url: uid,
         params: {},
-        paths: {}
+        paths: {},
+        throughWeb: true
     });
 
     document = createWakaHtmlParser(result["body"]);
@@ -172,6 +177,18 @@ func getConfigInfo() {
         version: 1,
         filters: [],
         searchAvailable: true,
-        protectorConfig: null
+        protectorConfig: buildProtectorConfig({
+            pingUrl: "https://manga.in.ua/mangas/page/1",
+            needToLogin: false,
+            inAppWebBrowserInterceptor: true
+        })
     });
+}
+
+func passProtector(data) {
+    useHeaders({headers: data["headers"]});
+}
+
+func passWebBrowserInterceptorController(controller) {
+    registerInterceptorController(controller);
 }
