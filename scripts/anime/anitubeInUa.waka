@@ -90,34 +90,51 @@ func getConcrete(uid, data) {
 
     if(playlistVideoPlayer != null) {
 
-    jsCode =     `const playerlistPlayer = document.querySelector(".playlists-player");` +
-                 `const dubbers = Array.from(playerlistPlayer.getElementsByClassName("playlists-items")[0].getElementsByTagName("li")).map((e) => {` +
-                 `    return {` +
-                 `        title: e.textContent,` +
-                 `        id: e.attributes["data-id"].textContent` +
-                 `    }` +
-                 `});` +
-                 `const providers = Array.from(playerlistPlayer.getElementsByClassName("playlists-items")[1].getElementsByTagName("li")).map((e) => {` +
-                 `    return {` +
-                 `        title: e.textContent,` +
-                 `        id: e.attributes["data-id"].textContent` +
-                 `    }` +
-                 `});` +
-                 `const videos = Array.from(playerlistPlayer.getElementsByClassName("playlists-items")[2].getElementsByTagName("li")).map((e) => {` +
-                 `    return {` +
-                 `        title: e.textContent,` +
-                 `        id: e.attributes["data-id"].textContent,` +
-                 `        src: e.attributes["data-file"].textContent` +
-                 `    }` +
-                 `});` +
-                 `return dubbers.map((dubber) => {` +
-                 `    return providers.filter((p) => p.id.slice(0, 3) === dubber.id).map((provider) => {` +
-                 `        return {` +
-                 `            title: dubber.title + " | " + provider.title,` +
-                 `            videos: videos.filter((video) => video.id === provider.id)` +
-                 `        }` +
-                 `    })` +
-                 `}).flat(1);`;
+    jsCode =                 `const items = document.querySelector(".playlists-player").getElementsByClassName("playlists-items");` +
+                             `let dubbers;` +
+                             `let providers;` +
+                             `let videos;` +
+                             `if(items.length == 3) {` +
+                             `    dubbers = Array.from(items[0].getElementsByTagName("li")).map((e) => {` +
+                             `        return {` +
+                             `            title: e.textContent,` +
+                             `            id: e.attributes["data-id"].textContent` +
+                             `        }` +
+                             `    });` +
+                             `}` +
+                             ` providers = Array.from(items[dubbers ? 1 : 0].getElementsByTagName("li")).map((e) => {` +
+                             `    return {` +
+                             `        title: e.textContent,` +
+                             `        id: e.attributes["data-id"].textContent` +
+                             `    }` +
+                             `});` +
+                             ` videos = Array.from(items[dubbers ? 2 : 1].getElementsByTagName("li")).map((e) => {` +
+                             `    return {` +
+                             `        title: e.textContent,` +
+                             `        id: e.attributes["data-id"].textContent,` +
+                             `        src: e.attributes["data-file"].textContent` +
+                             `    }` +
+                             `});` +
+                             `let res;` +
+                             `if(dubbers) {` +
+                             `     res = dubbers.map((dubber) => {` +
+                             `        return providers.filter((p) => p.id.slice(0, 3) === dubber.id).map((provider) => {` +
+                             `            return {` +
+                             `                title: dubber.title + " | " + provider.title,` +
+                             `                videos: videos.filter((video) => video.id === provider.id)` +
+                             `            }` +
+                             `        })` +
+                             `    }).flat(1);` +
+                             `} else {` +
+                             `    res = providers.map((provider) => {` +
+                             `        return {` +
+                             `            title: provider.title,` +
+                             `            videos: videos.filter((video) => video.id === provider.id)` +
+                             `        }` +
+                             `    });` +
+                             `}` +
+                             `return res;`
+                             ;
 
     } else {
         jsCode =         `const videoSrc = [];` +
