@@ -77,48 +77,66 @@ func getConcrete(uid) {
 
     chaptersList = data.chapters.list;
 
-    chapters = [];
+    chapterGroups = [];
 
     branches = data.chapters.branches;
-    branchId = null;
+    teams = data.chapters.teams;
 
     if(branches.isNotEmpty) {
         branchId = branches[0].id;
     }
 
-    for(i = 0; i < chaptersList.length; i = i + 1) {
-        chapter = chaptersList[i];
-        chapterName = "";
-        chapterNumber = "";
-        chapterVolume = 1;
+    for(j = 0; j < branches.length; j = j + 1) {
+        branch = branches[j];
+        team = teams[j];
+        chapters = [];
 
-        if(chapter.chapter_name != null) {
-            chapterName = chapter.chapter_name;
+        for(i = 0; i < chaptersList.length; i = i + 1) {
+            chapter = chaptersList[i];
+            chapterName = "";
+            chapterNumber = "";
+            chapterVolume = 1;
+
+            if(chapter.chapter_name != null) {
+                chapterName = chapter.chapter_name;
+            }
+
+            if(chapter.chapter_number != null) {
+                chapterNumber = chapter.chapter_number;
+            }
+
+            if(chapter.chapter_volume != null) {
+                chapterVolume = chapter.chapter_volume;
+            }
+
+
+
+            chapter["slug"] = uid;
+            chapter["id"] = data.user.id;
+            chapter["bid"] = branch.id;
+
+            if(chapter.branch_id == branch.id) {
+                chapters.add(buildChapter({
+                            uid: chapter.chapter_slug,
+                            title: "Том " + parseString(chapterVolume) + " Глава " + chapterNumber  + " " + chapterName,
+                            timestamp: chapter.chapter_created_at,
+                            data: chapter
+                        }));
+            }
         }
 
-        if(chapter.chapter_number != null) {
-            chapterNumber = chapter.chapter_number;
-        }
+        chapterGroups.add(buildChapterGroups({
+            title: team.name,
+            chapters: chapters,
+            data: {
+                branch: branch,
+                team: team
+            }
+        }));
 
-        if(chapter.chapter_volume != null) {
-            chapterVolume = chapter.chapter_volume;
-        }
-
-
-
-        chapter["slug"] = uid;
-        chapter["id"] = data.user.id;
-        chapter["bid"] = branchId;
-
-        if(chapter.branch_id == branchId) {
-            chapters.add(buildChapter({
-                        uid: chapter.chapter_slug,
-                        title: "Том " + parseString(chapterVolume) + " Глава " + chapterNumber  + " " + chapterName,
-                        timestamp: chapter.chapter_created_at,
-                        data: chapter
-                    }));
-        }
     }
+
+
 
     description = document.getElementsByClassName("media-description__text")[0].text;
 
@@ -142,7 +160,7 @@ func getConcrete(uid) {
         description: description,
         cover: cover,
         tags: tags,
-        chapters: chapters
+        chapterGroups: chapterGroups
     });
 }
 

@@ -284,9 +284,13 @@ func handleConcreteView(data) {
         description: description,
         cover: cover,
         tags: tags,
-        chapters: getChapters({
-            uid: data["id"]
-        })
+        chapterGroups: [
+            buildChapterGroups({
+                        title: "Default",
+                        chapters: getChapters({ uid: data["id"] }),
+                        data: {}
+                    })
+        ]
     });
 }
 
