@@ -1,7 +1,7 @@
 import waka_json;
 import waka_http;
 import waka_collections;
-import waka_models;
+import waka_manga_models;
 import waka_date;
 
 func getCover(coverArtUid, mangaId) {
@@ -314,7 +314,7 @@ func getConfigInfo() {
 
     availableYears = [];
 
-    for(i = 1950; i <= 2022; i = i + 1) {
+    for(i = 1950; i <= 2023; i = i + 1) {
         addToList(availableYears, i);
     }
 
