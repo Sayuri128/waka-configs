@@ -169,7 +169,7 @@ func getConfigInfo() {
         filters: [],
         searchAvailable: false,
         protectorConfig: buildProtectorConfig({
-            pingUrl: "https://nhentai.net/api/galleries/all",
+            pingUrl: "https://nhentai.net",
             needToLogin: false,
             inAppWebBrowserInterceptor: false
         })
