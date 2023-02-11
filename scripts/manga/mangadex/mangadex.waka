@@ -247,13 +247,7 @@ func getPages(uid) {
 
 func handleConcreteView(data) {
 
-    originalTitle = data["attributes"]["title"].values.first;
-    prettyTitle = originalTitle;
-
-    title = buildTitle({
-        original: originalTitle,
-        pretty: ""
-    });
+    title = data["attributes"]["title"].values.first;
 
     description = data["attributes"]["description"].values.first;
 
@@ -312,90 +306,6 @@ func getConcrete(uid) {
     });
 
     return concrete;
-}
-
-func getConfigInfo() {
-
-    availableYears = [];
-
-    for(i = 1950; i <= 2023; i = i + 1) {
-        addToList(availableYears, i);
-    }
-
-    return buildConfigInfo({
-        name: "MangaDex",
-        logoUrl: "https://mangadex.org/_nuxt/fe9305523f3efa4185ff8ebcf401d17b.svg",
-        nsfw: false,
-        language: "Eng",
-        version: 1,
-        searchAvailable: true,
-        filters: [
-            buildManyOfAny({
-                paramName: "Authors",
-                param: "authors"
-            }),
-            buildManyOfAny({
-                paramName: "Artists",
-                param: "artists"
-            }),
-            buildOneOfMany({
-                paramName: "Year of release",
-                param: "year",
-                values: availableYears
-            }),
-            buildManyOfAny({
-                paramName: "Tags",
-                param: "includedTags"
-            }),
-            buildSwitcher({
-                paramName: "Tags mode",
-                param: "includedTagsMode",
-                onValue: "AND",
-                offValue: "OR"
-            }),
-            buildManyOfAny({
-                paramName: "Exclude tags",
-                param: "excludedTags"
-            }),
-            buildSwitcher({
-                paramName: "Exclude tags mode",
-                param: "excludedTagsMode",
-                onValue: "AND",
-                offValue: "OR"
-            }),
-            buildManyOfMany({
-                paramName: "Status",
-                param: "status",
-                values: [
-                    ["ongoing", "Ongoing"],
-                    ["completed", "Completed"],
-                    ["hiatus", "Hiatus"],
-                    ["cancelled", "Cancelled"],
-                ]
-            }),
-            buildManyOfMany({
-                paramName: "Base genre",
-                param: "publicationDemographic",
-                values: [
-                    ["shounen", "Shounen"],
-                    ["shoujo", "Shoujo"],
-                    ["josei", "Josei"],
-                    ["seinen", "Seinen"],
-                    ["none", "None"],
-                ]
-            }),
-            buildManyOfMany({
-                paramName: "Content rating",
-                param: "contentRating",
-                values: [
-                    ["safe", "Safe"],
-                    ["suggestive", "Suggestive"],
-                    ["erotica", "Erotica"]
-                ]
-            })
-        ],
-        protectorConfig: null
-    });
 }
 
 

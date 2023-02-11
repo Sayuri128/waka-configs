@@ -68,7 +68,6 @@ func getGallery(page, query, filters) {
         ) {
             cover = "";
         } else {
-            print("GetDataSrc");
             dataSrc = e.getElementsByTagName("figure")[0]
                 .getElementsByTagName("img")[0].attributes["data-src"];
             if(dataSrc == null) {
@@ -133,10 +132,7 @@ func getConcrete(uid) {
 
     return buildConcrete({
         uid: uid,
-        title: buildTitle({
-            original: "",
-            pretty: document.getElementsByClassName("UAname")[0].text
-        }),
+        title: document.getElementsByClassName("UAname")[0].text,
         description: description,
         cover: cover,
         tags: tags,
@@ -172,23 +168,6 @@ func getPages(uid) {
     return buildPages({ uid: uid,
                         value: value });
 
-}
-
-func getConfigInfo() {
-    return buildConfigInfo({
-        name: "Manga/in/UA",
-        logoUrl: "https://manga.in.ua/templates/MGinUA/images/logo.png",
-        nsfw: false,
-        language: "Українська",
-        version: 1,
-        filters: [],
-        searchAvailable: true,
-        protectorConfig: buildProtectorConfig({
-            pingUrl: "https://manga.in.ua/mangas/page/1",
-            needToLogin: false,
-            inAppWebBrowserInterceptor: false
-        })
-    });
 }
 
 func passProtector(data) {

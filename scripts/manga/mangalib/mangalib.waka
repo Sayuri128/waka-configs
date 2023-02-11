@@ -14,7 +14,7 @@ func getGallery(page, query, filters) {
     }
 
     result = httpPost({
-        url: "https://hentailib.me/api/list",
+        url: "https://mangalib.me/api/list",
         params: {},
         paths: {},
         body: {
@@ -22,8 +22,10 @@ func getGallery(page, query, filters) {
             dir: "desc",
             page: page,
             name: name,
-            site_id: "4",
+            site_id: "1",
             caution_list: [
+                "Отсутствует",
+                "16+",
                 "18+"
             ]
         },
@@ -98,7 +100,7 @@ func processChapter(chapter, data, branch, uid) {
 func getConcrete(uid) {
 
     result = httpGet({
-        url: "https://hentailib.me/" + uid,
+        url: "https://mangalib.me/" + uid,
         params: {},
         paths: {},
         throughWeb: true
@@ -179,10 +181,7 @@ func getConcrete(uid) {
 
     return buildConcrete({
         uid: uid,
-        title: buildTitle({
-            original: data.manga.name,
-            pretty: data.manga.rusName
-        }),
+        title: data.manga.rusName,
         description: description,
         cover: cover,
         tags: tags,
@@ -209,7 +208,7 @@ func getPages(uid, data) {
         chapterVolume = chapter.chapter_volume;
     }
 
-    url = "https://hentailib.me/" + chapter["slug"] + "/v" + parseString(chapterVolume) + "/c" + chapterNumber;
+    url = "https://mangalib.me/" + chapter["slug"] + "/v" + parseString(chapterVolume) + "/c" + chapterNumber;
 
     params = {
         ui: chapter["id"]
@@ -232,7 +231,7 @@ func getPages(uid, data) {
 
     for(i = 0; i < pages.length; i = i + 1) {
         page = pages[i];
-        pageImageUrl = "https://img3.imglib.info//manga/" + chapter["slug"] + "/chapters/" + chapter.chapter_slug + "/" + page.u;
+        pageImageUrl = "https://img33.imgslib.link//manga/" + chapter["slug"] + "/chapters/" + chapter.chapter_slug + "/" + page.u;
         value.add(pageImageUrl);
     }
 
@@ -241,28 +240,10 @@ func getPages(uid, data) {
 
 }
 
-
-func getConfigInfo() {
-    return buildConfigInfo({
-        name: "HentaiLib",
-        logoUrl: "https://hentailib.me/icons/android-icon-192x192.png?333",
-        nsfw: false,
-        language: "Russian",
-        version: 1,
-        filters: [],
-        searchAvailable: true,
-        protectorConfig: buildProtectorConfig({
-            pingUrl: "https://hentailib.me/manga-list",
-            needToLogin: true,
-            inAppWebBrowserInterceptor: true
-        })
-    });
-}
-
 func passProtector(data) {
 
     result = httpGet({
-        url: "https://hentailib.me/manga-list",
+        url: "https://mangalib.me/manga-list",
         params: {},
         paths: {},
         throughWeb: true

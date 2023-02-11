@@ -201,23 +201,6 @@ func getConcrete(uid, data) {
     });
 }
 
-func getConfigInfo() {
-    return buildConfigInfo({
-        name: "Anitube.in.ua",
-        logoUrl: "https://anitube.in.ua/uploads/ukr.png",
-        nsfw: false,
-        language: "Українська",
-        version: 1,
-        filters: [],
-        searchAvailable: true,
-        protectorConfig: buildProtectorConfig({
-            pingUrl: "https://anitube.in.ua/anime/",
-            needToLogin: false,
-            inAppWebBrowserInterceptor: true
-        })
-    });
-}
-
 func passProtector(data) {
     useHeaders({headers: data["headers"]});
 }

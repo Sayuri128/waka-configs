@@ -1,0 +1,14 @@
+{
+  "name": "Manga/in/UA",
+  "logoUrl": "https://manga.in.ua/templates/MGinUA/images/logo.png",
+  "nsfw": false,
+  "language": "Українська",
+  "version": 1,
+  "filters": [],
+  "protectorConfig": {
+    "pingUrl": "https://manga.in.ua/mangas/page/1",
+    "needToLogin": false,
+    "inAppBrowserInterceptor": false
+  },
+  "searchAvailable": true
+}

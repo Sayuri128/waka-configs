@@ -94,17 +94,11 @@ func getConcrete(uid) {
     info = document.getElementById("info");
     titleElements = document.getElementsByClassName("title");
 
-    original = titleElements[0].text;
-    pretty = "";
+    title = titleElements[0].text;
 
     if(titleElements.length > 1) {
         pretty = titleElements[1].text;
     }
-
-    title = buildTitle({
-        original: original,
-        pretty: pretty
-    });
 
     coverElement = document.getElementById("cover");
     img = coverElement.getElementsByTagName("img");
@@ -156,23 +150,6 @@ func getConcrete(uid) {
                         data: {}
                     })
         ]
-    });
-}
-
-func getConfigInfo() {
-    return buildConfigInfo({
-        name: "nhentai",
-        logoUrl: "https://i.kym-cdn.com/entries/icons/facebook/000/026/029/n.jpg",
-        nsfw: true,
-        language: "Mixed",
-        version: 1,
-        filters: [],
-        searchAvailable: false,
-        protectorConfig: buildProtectorConfig({
-            pingUrl: "https://nhentai.net",
-            needToLogin: false,
-            inAppWebBrowserInterceptor: false
-        })
     });
 }
 

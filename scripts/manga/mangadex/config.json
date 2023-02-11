@@ -1,0 +1,10 @@
+{
+  "name": "MangaDex",
+  "logoUrl": "https://mangadex.org/_nuxt/fe9305523f3efa4185ff8ebcf401d17b.svg",
+  "nsfw": false,
+  "language": "Mixed",
+  "version": 1,
+  "filters": [],
+  "protectorConfig": null,
+  "searchAvailable": true
+}

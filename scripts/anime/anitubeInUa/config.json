@@ -1,0 +1,14 @@
+{
+  "name": "Anitube.in.ua",
+  "logoUrl": "https://anitube.in.ua/uploads/ukr.png",
+  "nsfw": false,
+  "language": "Українська",
+  "version": 1,
+  "filters": [],
+  "protectorConfig": {
+    "pingUrl": "https://anitube.in.ua/anime/",
+    "needToLogin": false,
+    "inAppBrowserInterceptor": true
+  },
+  "searchAvailable": true
+}
