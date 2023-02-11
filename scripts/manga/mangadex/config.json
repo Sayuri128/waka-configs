@@ -1,5 +1,6 @@
 {
   "name": "MangaDex",
+  "uid": "23cf3ac5-3c7b-4914-9031-0d2c0e5a84b9",
   "logoUrl": "https://mangadex.org/_nuxt/fe9305523f3efa4185ff8ebcf401d17b.svg",
   "nsfw": false,
   "language": "Mixed",
