@@ -133,7 +133,7 @@ func getConcrete(uid) {
 
         chapterGroups.add(buildChapterGroups({
             title: title,
-            chapters: chapters,
+            elements: chapters,
             data: {
                 teams: teams
             }
@@ -154,7 +154,7 @@ func getConcrete(uid) {
 
             chapterGroups.add(buildChapterGroups({
                 title: team.name,
-                chapters: chapters,
+                elements: chapters,
                 data: {
                     branch: branch,
                     team: team
@@ -185,7 +185,7 @@ func getConcrete(uid) {
         description: description,
         cover: cover,
         tags: tags,
-        chapterGroups: chapterGroups
+        groups: chapterGroups
     });
 }
 

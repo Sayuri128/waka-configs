@@ -184,7 +184,8 @@ func getConcrete(uid, data) {
 
         videoGroups.add(buildAnimeVideoGroup({
                  title: player.title,
-                 videos: videos
+                 elements: videos,
+                 data: {}
         }));
 
     }
@@ -195,7 +196,7 @@ func getConcrete(uid, data) {
         title: data["title"],
         alternativeTitles: [],
         status: statusReleased(),
-        playerGroups: videoGroups,
+        groups: videoGroups,
         tags: tags,
         description: description
     });

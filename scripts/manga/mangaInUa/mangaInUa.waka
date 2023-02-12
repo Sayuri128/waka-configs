@@ -136,10 +136,10 @@ func getConcrete(uid) {
         description: description,
         cover: cover,
         tags: tags,
-        chapterGroups: [
+        groups: [
             buildChapterGroups({
                         title: "Default",
-                        chapters: chapters,
+                        elements: chapters,
                         data: {}
                     })
         ]

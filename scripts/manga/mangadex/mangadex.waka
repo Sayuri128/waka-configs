@@ -278,10 +278,10 @@ func handleConcreteView(data) {
         description: description,
         cover: cover,
         tags: tags,
-        chapterGroups: [
+        groups: [
             buildChapterGroups({
                         title: "Default",
-                        chapters: getChapters({ uid: data["id"] }),
+                        elements: getChapters({ uid: data["id"] }),
                         data: {}
                     })
         ]
